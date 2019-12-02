@@ -17,7 +17,127 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "keymap_common.h"
 
+/* Borrowed from keyboard/hhkb/unimap_hasu.c */
+/* id for user defined functions */
+enum function_id {
+    LSHIFT_LPAREN,
+    RSHIFT_RPAREN,
+};
 
+// Function: LShift with tap '('
+#define AC_LPRN     ACTION_FUNCTION_TAP(LSHIFT_LPAREN)
+#define AC_RPRN     ACTION_FUNCTION_TAP(RSHIFT_RPAREN)
+
+/*
+ * user defined action function
+ */
+void action_function(keyrecord_t *record, uint8_t id, uint8_t opt)
+{
+    if (record->event.pressed) dprint("P"); else dprint("R");
+    dprintf("%d", record->tap.count);
+    if (record->tap.interrupted) dprint("i");
+    dprint("\n");
+
+    switch (id) {
+        case LSHIFT_LPAREN:
+            // XXX: doesn't work with other tap key. iffy at least
+            // Shift parentheses example: LShft + tap '('
+            // http://stevelosh.com/blog/2012/10/a-modern-space-cadet/#shift-parentheses
+            // http://geekhack.org/index.php?topic=41989.msg1304899#msg1304899
+            if (record->event.pressed) {
+                if (record->tap.count > 0 && !record->tap.interrupted) {
+                    if (record->tap.interrupted) {
+                        dprint("tap interrupted\n");
+                        register_mods(MOD_BIT(KC_LSHIFT));
+                    }
+                } else {
+                    register_mods(MOD_BIT(KC_LSHIFT));
+                }
+            } else {
+                if (record->tap.count > 0 && !(record->tap.interrupted)) {
+                    add_weak_mods(MOD_BIT(KC_LSHIFT));
+                    send_keyboard_report();
+                    register_code(KC_9);
+                    unregister_code(KC_9);
+                    del_weak_mods(MOD_BIT(KC_LSHIFT));
+                    send_keyboard_report();
+                    record->tap.count = 0;  // ad hoc: cancel tap
+                } else {
+                    unregister_mods(MOD_BIT(KC_LSHIFT));
+                }
+            }
+            break;
+        case RSHIFT_RPAREN:
+            // XXX: doesn't work with other tap key. iffy at least
+            // Shift parentheses example: LShft + tap '('
+            // http://stevelosh.com/blog/2012/10/a-modern-space-cadet/#shift-parentheses
+            // http://geekhack.org/index.php?topic=41989.msg1304899#msg1304899
+            if (record->event.pressed) {
+                if (record->tap.count > 0 && !record->tap.interrupted) {
+                    if (record->tap.interrupted) {
+                        dprint("tap interrupted\n");
+                        register_mods(MOD_BIT(KC_RSHIFT));
+                    }
+                } else {
+                    register_mods(MOD_BIT(KC_RSHIFT));
+                }
+            } else {
+                if (record->tap.count > 0 && !(record->tap.interrupted)) {
+                    add_weak_mods(MOD_BIT(KC_RSHIFT));
+                    send_keyboard_report();
+                    register_code(KC_0);
+                    unregister_code(KC_0);
+                    del_weak_mods(MOD_BIT(KC_RSHIFT));
+                    send_keyboard_report();
+                    record->tap.count = 0;  // ad hoc: cancel tap
+                } else {
+                    unregister_mods(MOD_BIT(KC_RSHIFT));
+                }
+            }
+            break;
+    }
+}
+
+
+/* DVORAK + Space Cadet Shift */
+const uint8_t keymaps[][MATRIX_ROWS][MATRIX_COLS] PROGMEM = {
+    /* Dvorak http://en.wikipedia.org/wiki/Dvorak_Simplified_Keyboard, Modified
+     * ,-----------------------------------------------------------.
+     * |  `|  1|  2|  3|  4|  5|  6|  7|  8|  9|  0|  [|  ]|Backspa|
+     * |-----------------------------------------------------------|
+     * |Tab  |  '|  ,|  .|  P|  Y|  F|  G|  C|  R|  L|  /|  =|    \|
+     * |-----------------------------------------------------------|
+     * |Ctrl  |  A|  O|  E|  U|  I|  D|  H|  T|  N|  S|  -|Return  |
+     * |-----------------------------------------------------------|
+     * |Shift/( |  ;|  Q|  J|  K|  X|  B|  M|  W|  V|  Z|Shift/)   |
+     * |-----------------------------------------------------------|
+     * |Ctrl |Alt |Cmd |         Space         |Cmd |Alt |Menu|Ctrl|
+     * `-----------------------------------------------------------'
+     */
+    KEYMAP_ALL(
+              F13, F14, F15, F16, F17, F18, F19, F20, F21, F22, F23, F24,
+    ESC,      F1,  F2,  F3,  F4,  F5,  F6,  F7,  F8,  F9,  F10, F11, F12,           PSCR,SLCK,PAUS,    VOLD,VOLU,MUTE,PWR,     HELP,
+    GRV, 1,   2,   3,   4,   5,   6,   7,   8,   9,   0,   LBRC,RBRC,JYEN,BSPC,     INS, HOME,PGUP,    NLCK,PSLS,PAST,PMNS,    STOP,AGIN,
+    TAB, QUOT,COMM,DOT, P,   Y,   F,   G,   C,   R,   L,   SLSH,EQL,      BSLS,     DEL, END, PGDN,    P7,  P8,  P9,  PPLS,    MENU,UNDO,
+    LCTL,A,   O,   E,   U,   I,   D,   H,   T,   N,   S,   MINS,     NUHS,ENT,                         P4,  P5,  P6,  PCMM,    SLCT,COPY,
+    FN0 ,NUBS,SCLN,Q,   J,   K,   X,   B,   M,   W,   V,   Z,        RO,  FN1 ,          UP,           P1,  P2,  P3,  PEQL,    EXEC,PSTE,
+    LCTL,LALT,LGUI,MHEN,HANJ,     SPC,      HAEN,HENK,KANA,RALT,RGUI,APP, RCTL,     LEFT,DOWN,RGHT,    P0,       PDOT,PENT,    FIND,CUT
+    ),
+};
+
+#define MY_LPAREN ACTION_KEY(MOD_LSFT | KC_9)
+#define MY_RPAREN ACTION_KEY(MOD_RSFT | KC_0)
+
+const action_t fn_actions[] PROGMEM = {
+    [0] = AC_LPRN,
+    [1] = AC_RPRN,
+};
+
+
+
+
+/* DEFAULT */
+#if 0
 const uint8_t keymaps[][MATRIX_ROWS][MATRIX_COLS] PROGMEM = {
     /* 0: plain Qwerty without layer switching
      *         ,---------------. ,---------------. ,---------------.
@@ -49,7 +169,7 @@ const uint8_t keymaps[][MATRIX_ROWS][MATRIX_COLS] PROGMEM = {
 };
 
 const action_t fn_actions[] PROGMEM = {};
-
+#endif
 
 
 /*
@@ -103,7 +223,7 @@ const action_t fn_actions[] PROGMEM = {};
     TAB, Q,   W,   E,   R,   T,   Y,   U,   I,   O,   P,   LBRC,RBRC,ENT,      DEL, END, PGDN,    P7,  P8,  P9,  PPLS,
     LCTL,A,   S,   D,   F,   G,   H,   J,   K,   L,   SCLN,QUOT,NUHS,                             P4,  P5,  P6,
     LSFT,NUBS,Z,   X,   C,   V,   B,   N,   M,   COMM,DOT, SLSH,     RSFT,          UP,           P1,  P2,  P3,  PENT,
-    LCTL,LGUI,LALT,          SPC,                     RALT,RGUI,APP, RCTL,     LEFT,DOWN,RGHT,    P0,       PDOT 
+    LCTL,LGUI,LALT,          SPC,                     RALT,RGUI,APP, RCTL,     LEFT,DOWN,RGHT,    P0,       PDOT
     ),
 
     /* JIS layout
@@ -128,7 +248,7 @@ const action_t fn_actions[] PROGMEM = {};
     TAB, Q,   W,   E,   R,   T,   Y,   U,   I,   O,   P,   LBRC,RBRC,     ENT,      DEL, END, PGDN,    P7,  P8,  P9,  PPLS,
     LCTL,A,   S,   D,   F,   G,   H,   J,   K,   L,   SCLN,QUOT,NUHS,                                  P4,  P5,  P6,
     LSFT,Z,   X,   C,   V,   B,   N,   M,   COMM,DOT, SLSH,          RO,  RSFT,          UP,           P1,  P2,  P3,  PENT,
-    LCTL,LGUI,LALT,MHEN,     SPC,                HENK,KANA,RALT,RGUI,APP, RCTL,     LEFT,DOWN,RGHT,    P0,       PDOT 
+    LCTL,LGUI,LALT,MHEN,     SPC,                HENK,KANA,RALT,RGUI,APP, RCTL,     LEFT,DOWN,RGHT,    P0,       PDOT
     ),
 
     /* Colemak http://colemak.com
