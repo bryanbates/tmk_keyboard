@@ -13,6 +13,46 @@ This project is intended to integrated existent TMK XT, PS/2 and Terminal conver
 
 
 
+Keyboard supported
+------------------
+- PC XT keyboard of IBM 5150 5160
+  - 83-key: 1501100 1501105
+- PC AT keyboard of IBM 5170
+  - 84-key: 6450200 6450225
+- PC Terminal keyboard of IBM 5271(3270 PC)
+  - 122-key: 6110344 6110345 1397000
+  - 102-key: 1390680 1395764 1392595
+- PS/2 keyboards(AT+CodeSet2)
+- Clones of above models
+
+
+
+Keyobard discrimination
+-----------------------
+The converter need to determine protocols and scan code sets of keyboard before starting to receive and translate scan codes from keyboard.
+
+After startup the converter sends 0xF2 command to get keyobard identity and determine protocol and scan code set according to how the keyobard respond to the command.
+
+Response and keyboard ID:
+
+- XT keyboard doesn't any command and returns no response.
+- AT keyboard should respond with 0xFA to the command but returns no keyboard ID.
+- PS/2 keyboard should respond with 0xFA to the command, followd by keyboard ID, such as 0xAB86.
+- Terminal keyboard should respond with 0xFA to the command, followed by keyboard ID, such as 0xBFBF.
+
+Now we can know proper protocol and scan code set suitable for the keyboard in quesiton.
+
+### Protocol
+- Signals from XT keyboard are recognized by XT protocol.
+- Signals from AT, PS/2 and Terminal keyboard are recognized by AT protocol.
+
+### Scan code Set
+- Scan codes from XT keyboard are handled as CodeSet1.
+- Scan codes from AT and PS/2 keyboard are handled as CodeSet2.
+- Scan codes from Terminal keyhboard are handled as CodeSet3.
+
+
+
 Hardware
 --------
 Firmware supports ATMega32u4 by default, Teensy2/2++ or ProMicro can be used.
@@ -63,47 +103,6 @@ Build Firmware
 
     $ cd converter/ibmpc_usb
     $ make
-
-
-
-Keyboard supported
-------------------
-- PC XT keyboard of IBM 5150 5160
-	83-key: 1501100 1501105
-- PC AT keyboard of IBM 5170
-	84-key: 6450200 6450225
-- PC Terminal keyboard of IBM 5271(3270 PC)
-	122-key: 6110344 6110345 1397000
-	102-key: 1390680 1395764 1392595
-- PS/2 keyboards(AT+CodeSet2)
-- Clones of above models
-
-
-
-Keyobard discrimination
------------------------
-The converter need to determine protocols and scan code sets of keyboard before starting to receive and translate scan codes from keyboard.
-
-After startup the converter sends 0xF2 command to get keyobard identity and determine protocol and scan code set according to how the keyobard respond to the command.
-
-Response and keyboard ID:
-
-- XT keyboard doesn't any command and returns no response.
-- AT keyboard should respond with 0xFA to the command but returns no keyboard ID.
-- PS/2 keyboard should respond with 0xFA to the command, followd by keyboard ID, such as 0xAB86.
-- Terminal keyboard should respond with 0xFA to the command, followed by keyboard ID, such as 0xBFBF.
-
-Now we can know proper protocol and scan code set suitable for the keyboard in quesiton.
-
-### Protocol
-- Signals from XT keyboard are recognized by XT protocol.
-- Signals from AT, PS/2 and Terminal keyboard are recognized by AT protocol.
-
-### Scan code Set
-- Scan codes from XT keyboard are handled as CodeSet1.
-- Scan codes from AT and PS/2 keyboard are handled as CodeSet2.
-- Scan codes from Terminal keyhboard are handled as CodeSet3.
-
 
 
 
