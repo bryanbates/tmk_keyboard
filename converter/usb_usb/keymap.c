@@ -107,7 +107,7 @@ const uint8_t keymaps[][MATRIX_ROWS][MATRIX_COLS] PROGMEM = {
      * |-----------------------------------------------------------|
      * |Tab  |  '|  ,|  .|  P|  Y|  F|  G|  C|  R|  L|  /|  =|    \|
      * |-----------------------------------------------------------|
-     * |Ctrl  |  A|  O|  E|  U|  I|  D|  H|  T|  N|  S|  -|Return  |
+     * |Ctl/Es|  A|  O|  E|  U|  I|  D|  H|  T|  N|  S|  -|Return  |
      * |-----------------------------------------------------------|
      * |Shift/( |  ;|  Q|  J|  K|  X|  B|  M|  W|  V|  Z|Shift/)   |
      * |-----------------------------------------------------------|
@@ -119,7 +119,7 @@ const uint8_t keymaps[][MATRIX_ROWS][MATRIX_COLS] PROGMEM = {
     ESC,      F1,  F2,  F3,  F4,  F5,  F6,  F7,  F8,  F9,  F10, F11, F12,           PSCR,SLCK,PAUS,    VOLD,VOLU,MUTE,PWR,     HELP,
     GRV, 1,   2,   3,   4,   5,   6,   7,   8,   9,   0,   LBRC,RBRC,JYEN,BSPC,     INS, HOME,PGUP,    NLCK,PSLS,PAST,PMNS,    STOP,AGIN,
     TAB, QUOT,COMM,DOT, P,   Y,   F,   G,   C,   R,   L,   SLSH,EQL,      BSLS,     DEL, END, PGDN,    P7,  P8,  P9,  PPLS,    MENU,UNDO,
-    LCTL,A,   O,   E,   U,   I,   D,   H,   T,   N,   S,   MINS,     NUHS,ENT,                         P4,  P5,  P6,  PCMM,    SLCT,COPY,
+    FN2 ,A,   O,   E,   U,   I,   D,   H,   T,   N,   S,   MINS,     NUHS,ENT,                         P4,  P5,  P6,  PCMM,    SLCT,COPY,
     FN0 ,NUBS,SCLN,Q,   J,   K,   X,   B,   M,   W,   V,   Z,        RO,  FN1 ,          UP,           P1,  P2,  P3,  PEQL,    EXEC,PSTE,
     LCTL,LALT,LGUI,MHEN,HANJ,     SPC,      HAEN,HENK,KANA,RALT,RGUI,APP, RCTL,     LEFT,DOWN,RGHT,    P0,       PDOT,PENT,    FIND,CUT
     ),
@@ -131,6 +131,7 @@ const uint8_t keymaps[][MATRIX_ROWS][MATRIX_COLS] PROGMEM = {
 const action_t fn_actions[] PROGMEM = {
     [0] = AC_LPRN,
     [1] = AC_RPRN,
+    [2] = ACTION_MODS_TAP_KEY(MOD_LCTL, KC_ESC),
 };
 
 
